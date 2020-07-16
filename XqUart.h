@@ -15,6 +15,7 @@
 void xqUartInit(unsigned int baud);
 int xqUartSendByte(unsigned char c);
 int xqUartSendMsg(unsigned char* msg, int len);
+int xqUartSendStr(const char* str);
 void xqUartSetByteRecvCb( void (*cb)(unsigned char));
 
 #endif /* XQ_UART_H */

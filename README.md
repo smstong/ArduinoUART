@@ -1,4 +1,30 @@
-#Arduino Drivers
+# Arduino Drivers
+
+## KeyBoard driver
+### Usage
+	include "XqKb.h"
+	
+	void OnKeyDown(char key)
+	{
+	xqUartSendByte(key);
+	}
+
+	XqKb kb1;
+	unsigned char rowPins[] = {9,8,7,6};
+	unsigned char colPins[] = {5,4,3,2};
+	char keyMaps[] = {
+		'1', '2', '3', 'A', 
+		'4', '5', '6', 'B',
+		'7', '8', '9', 'C',
+		'*', '0', '#', 'D',
+	};
+
+	xqKbInit(&kb1, rowPins, colPins, 
+			&keyMaps[0], 
+			sizeof(rowPins)/sizeof(rowPins[0]),
+			sizeof(colPins)/sizeof(colPins[0]),
+			OnKeyDown);
+
 
 ## GPIO driver
 ### Usage

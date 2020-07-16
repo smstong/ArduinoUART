@@ -162,3 +162,7 @@ void xqUartInit(unsigned int baud)
 {
 	uart_init(baud);
 }
+int xqUartSendStr(const char* str)
+{
+	xqUartSendMsg((unsigned char*)str, strlen(str));
+}
