@@ -1,3 +1,14 @@
+/***************************************************************
+ * UART Driver for Ardudino
+ *
+ * Hardware connection:
+ *
+ * external    Arduino
+ * Rx	<---->	Tx(pin 1)
+ * Tx	<---->	Rx(pin 0)
+ * GND	<---->	GND
+ *
+ * ************************************************************/
 #ifndef XQ_UART_H
 #define XQ_UART_H
 

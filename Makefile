@@ -8,13 +8,19 @@ all: app.hex
 app.hex: app.elf
 	avr-objcopy -O ihex -R .eeprom $< $@
 
-app.elf: app.o XqUart.o 
+app.elf: app.o XqUart.o XqGpio.o XqLcd.o
 	avr-gcc $(LDFLAGS) -o $@ $^
 
 app.o: app.c
 	avr-gcc $(CFLAGS) -c -o $@ $<
 
-XqUart.o: XqUart.c
+XqUart.o: XqUart.c XqUart.h
+	avr-gcc $(CFLAGS) -c -o $@ $<
+
+XqGpio.o: XqGpio.c XqGpio.h
+	avr-gcc $(CFLAGS) -c -o $@ $<
+
+XqLcd.o: XqLcd.c XqLcd.h
 	avr-gcc $(CFLAGS) -c -o $@ $<
 
 deploy: app.hex
