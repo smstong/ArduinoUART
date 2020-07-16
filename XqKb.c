@@ -35,7 +35,7 @@ static u8 find_low_col(XqKb* kb)
 	return (u8)-1;
 }
 
-static void kb_scan(XqKb* kb)
+static char kb_scan(XqKb* kb)
 {
 	u8 i;
 	u8 lowCol;
@@ -54,17 +54,20 @@ static void kb_scan(XqKb* kb)
 	}
 
 	/* find the row index */
+	char found = 0;
 	for(i=0; i<kb->rows; i++){
 		ground_one_row(kb, i);
 		lowCol = find_low_col(kb);
-		if(lowCol == (u8)-1){
-			/*debug("scan error\r\n");*/
-		}else{
-			/*find the key at (i,lowCol)*/
-			if(kb->onKeyDown){
-				kb->onKeyDown(*(kb->keyMaps + kb->cols*i + lowCol));
-			}
+		if(lowCol != (u8)-1){
+			found =1;
+			break;
 		}
+	}
+
+	if(found){
+		return (*(kb->keyMaps + kb->cols*i + lowCol));
+	}else{
+		return 0;
 	}
 }
 
@@ -73,8 +76,7 @@ static void kb_scan(XqKb* kb)
 void xqKbInit(XqKb* kb, 
 		unsigned char *rowPins, unsigned char *colPins,
 		unsigned char *keyMaps,
-		unsigned char rows, unsigned char cols,
-		XqKbCb cb)
+		unsigned char rows, unsigned char cols)
 {
 	int i=0;
 
@@ -83,7 +85,6 @@ void xqKbInit(XqKb* kb,
 	kb->keyMaps = keyMaps;
 	kb->rows = rows;
 	kb->cols = cols;
-	kb->onKeyDown = cb;
 
 	for(i=0; i<rows; i++){
 		xqGpioSetMode(rowPins[i], OUT);
@@ -91,10 +92,9 @@ void xqKbInit(XqKb* kb,
 	for(i=0; i<cols; i++){
 		xqGpioSetMode(colPins[i], IN);
 	}
-
-	while(1){
-		kb_scan(kb);
-	}
 }
 
-
+char xqKbGetKey(XqKb* kb)
+{
+	return kb_scan(kb);
+}

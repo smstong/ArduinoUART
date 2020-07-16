@@ -4,11 +4,6 @@
 ### Usage
 	include "XqKb.h"
 	
-	void OnKeyDown(char key)
-	{
-	xqUartSendByte(key);
-	}
-
 	XqKb kb1;
 	unsigned char rowPins[] = {9,8,7,6};
 	unsigned char colPins[] = {5,4,3,2};
@@ -22,9 +17,11 @@
 	xqKbInit(&kb1, rowPins, colPins, 
 			&keyMaps[0], 
 			sizeof(rowPins)/sizeof(rowPins[0]),
-			sizeof(colPins)/sizeof(colPins[0]),
-			OnKeyDown);
+			sizeof(colPins)/sizeof(colPins[0]));
 
+	...
+	char c = xqKbGetKey(&kb1);
+	...
 
 ## GPIO driver
 ### Usage

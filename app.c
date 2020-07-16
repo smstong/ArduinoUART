@@ -18,11 +18,6 @@ void uart_cb(unsigned char c)
 	xqUartSendByte(c);
 }
 
-void OnKeyDown(char key)
-{
-	xqUartSendByte(key);
-}
-
 int main()
 {
 	xqUartInit(9600);
@@ -40,8 +35,12 @@ int main()
 	xqKbInit(&kb1, rowPins, colPins, 
 			&keyMaps[0], 
 			sizeof(rowPins)/sizeof(rowPins[0]),
-			sizeof(colPins)/sizeof(colPins[0]),
-			OnKeyDown);
+			sizeof(colPins)/sizeof(colPins[0]));
+
+	int i=0;
+	for(i=0; i<10; i++){
+		xqUartSendByte(xqKbGetKey(&kb1));
+	}	
 
 	return 0;
-}
+	}

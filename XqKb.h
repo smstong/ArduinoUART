@@ -4,8 +4,6 @@
 #define XQ_KB_MAX_ROWS 8
 #define XQ_KB_MAX_COLS 8
 
-typedef void (*XqKbCb)(char key);
-
 typedef struct XqKb 
 {
 	unsigned char *rowPins;
@@ -13,14 +11,14 @@ typedef struct XqKb
 	unsigned char *keyMaps;
 	unsigned char rows;
 	unsigned char cols;
-	XqKbCb onKeyDown;
 
 }XqKb;
 
 void xqKbInit(XqKb* kb, 
 		unsigned char *rowPins, unsigned char *colPins,
 	   	unsigned char *keyMaps,
-	    unsigned char rows, unsigned char cols,
-		XqKbCb cb);
+	    unsigned char rows, unsigned char cols);
+
+char xqKbGetKey(XqKb* kb);
 
 #endif
