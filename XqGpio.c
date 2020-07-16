@@ -10,7 +10,7 @@ find_pin(unsigned char pin, char* pPort, unsigned char* pPin)
 	}else if(pin>=8 && pin<=13){
 		*pPort = 'B';
 		*pPin = pin-8;
-	}else if(pin>A0 && pin<=A5){
+	}else if(pin>=A0 && pin<=A5){
 		*pPort = 'C';
 		*pPin = pin-A0;
 	}else{
