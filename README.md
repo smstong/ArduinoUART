@@ -1,8 +1,20 @@
 # Arduino Drivers
 
+## ADC driver
+### Usage
+	#include "XqAdc.h"
+	
+	void A0_ready(unsigned int r)
+	{
+		/* do anything with r */
+	}
+	xqAdcInit();
+	xqAdcAdd(A0, 1, A0_ready); 
+	xqAdcStart();
+
 ## KeyBoard driver
 ### Usage
-	include "XqKb.h"
+	#include "XqKb.h"
 	
 	XqKb kb1;
 	unsigned char rowPins[] = {9,8,7,6};
