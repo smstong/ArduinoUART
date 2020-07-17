@@ -10,12 +10,32 @@
 #include "XqLcd.h"
 #include "XqGpio.h"
 #include "XqKb.h"
+#include "XqAdc.h"
 
-XqKb kb1;
 
 void uart_cb(unsigned char c)
 {
 	xqUartSendByte(c);
+}
+
+void A0_ready(unsigned int r)
+{
+	char msg[16];
+	sprintf(msg, "A0: %d\r\n", r);
+	xqUartSendStr(msg);
+}
+
+void A5_ready(unsigned int r)
+{
+	char msg[16];
+	sprintf(msg, "A5: %d\r\n", r);
+	xqUartSendStr(msg);
+}
+void A2_ready(unsigned int r)
+{
+	char msg[16];
+	sprintf(msg, "A2: %d\r\n", r);
+	xqUartSendStr(msg);
 }
 
 int main()
@@ -23,24 +43,13 @@ int main()
 	xqUartInit(9600);
 	xqUartSetByteRecvCb(uart_cb);
 
-	unsigned char rowPins[] = {9,8,7,6};
-	unsigned char colPins[] = {5,4,3,2};
-	char keyMaps[] = {
-		'1', '2', '3', 'A', 
-		'4', '5', '6', 'B',
-		'7', '8', '9', 'C',
-		'*', '0', '#', 'D',
-	};
-	
-	xqKbInit(&kb1, rowPins, colPins, 
-			&keyMaps[0], 
-			sizeof(rowPins)/sizeof(rowPins[0]),
-			sizeof(colPins)/sizeof(colPins[0]));
+	xqAdcInit();
+	xqAdcAdd(A0, 1, A0_ready); 
+	xqAdcAdd(A5, 1, A5_ready); 
+	xqAdcAdd(A2, 1, A2_ready); 
+	xqAdcStart();
 
-	int i=0;
-	for(i=0; i<10; i++){
-		xqUartSendByte(xqKbGetKey(&kb1));
-	}	
 
+	while(1);
 	return 0;
-	}
+}

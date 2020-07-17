@@ -1,4 +1,4 @@
-CFLAGS ?= -Os -DF_APU=16000000UL -mmcu=atmega328p
+CFLAGS ?= -Os -DF_APU=16000000UL -mmcu=atmega328p 
 LDFLAGS ?= -mmcu=atmega328p
 
 ARDUINO_USB ?= /dev/ttyACM0
@@ -8,7 +8,7 @@ all: app.hex
 app.hex: app.elf
 	avr-objcopy -O ihex -R .eeprom $< $@
 
-app.elf: app.o XqUart.o XqGpio.o XqLcd.o XqKb.o
+app.elf: app.o XqUart.o XqGpio.o XqLcd.o XqKb.o XqAdc.o
 	avr-gcc $(LDFLAGS) -o $@ $^
 
 app.o: app.c
@@ -24,6 +24,9 @@ XqLcd.o: XqLcd.c XqLcd.h
 	avr-gcc $(CFLAGS) -c -o $@ $<
 
 XqKb.o: XqKb.c XqKb.h
+	avr-gcc $(CFLAGS) -c -o $@ $<
+
+XqAdc.o: XqAdc.c XqAdc.h
 	avr-gcc $(CFLAGS) -c -o $@ $<
 
 deploy: app.hex
