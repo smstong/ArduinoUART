@@ -11,31 +11,34 @@
 #include "XqGpio.h"
 #include "XqKb.h"
 #include "XqAdc.h"
+#include "XqStepMotor.h"
+#include <avr/interrupt.h>
 
+XqStepMotor m1;
 
 void uart_cb(unsigned char c)
 {
 	xqUartSendByte(c);
 }
-
-void A0_ready(unsigned int r)
+void on_second(unsigned int seconds)
 {
-	char msg[16];
-	sprintf(msg, "A0: %d\r\n", r);
-	xqUartSendStr(msg);
+	if(seconds % 5 == 0){
+		xqStepMotorSetDir(&m1, -xqStepMotorGetDir(&m1));
+	}	
 }
+void on_ms()
+{
+	static unsigned int ms = 0;
+	static unsigned int seconds = 0;
 
-void A5_ready(unsigned int r)
-{
-	char msg[16];
-	sprintf(msg, "A5: %d\r\n", r);
-	xqUartSendStr(msg);
-}
-void A2_ready(unsigned int r)
-{
-	char msg[16];
-	sprintf(msg, "A2: %d\r\n", r);
-	xqUartSendStr(msg);
+	if(ms % 1000 == 0){
+		seconds ++;
+		on_second(seconds);
+	}
+	if(ms % 2 == 0){
+		xqStepMotorStep(&m1);
+	}
+	ms ++;
 }
 
 int main()
@@ -43,12 +46,10 @@ int main()
 	xqUartInit(9600);
 	xqUartSetByteRecvCb(uart_cb);
 
-	xqAdcInit();
-	xqAdcAdd(A0, 1, A0_ready); 
-	xqAdcAdd(A5, 1, A5_ready); 
-	xqAdcAdd(A2, 1, A2_ready); 
-	xqAdcStart();
+	xqStepMotorInit(&m1, 8,9,10,11);
 
+	xqTimerInit(on_ms);
+	xqTimerStart();
 
 	while(1);
 	return 0;
