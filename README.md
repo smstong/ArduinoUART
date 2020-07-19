@@ -1,5 +1,31 @@
 # Arduino Drivers
 
+## Stepper motor driver
+### Usage
+
+	#include "XqStepMotor.h"
+	
+	XqStepMotor m1;
+	
+	xqStepMotorInit(&m1, 2,3,4,5);
+	xqStepMotorSetDir(&m1, -1);
+
+	/* go one step */
+	xqStepMotorStep();
+	
+
+## 1ms Timer driver
+### Usage
+	#include "XqTimer.h"
+	
+	void on_ms()
+	{
+		/* run something every 1 ms here */
+	}
+	
+	xqTimerInit(on_ms);	
+	xqTimerStart();
+	
 ## ADC driver
 ### Usage
 	#include "XqAdc.h"
