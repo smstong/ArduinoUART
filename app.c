@@ -12,69 +12,50 @@
 #include "XqKb.h"
 #include "XqAdc.h"
 #include "XqStepMotor.h"
+#include "XqD7.h"
 #include <avr/interrupt.h>
 
 
+XqD7 d1;
+char buf[] = {'0', '0', '0', '0', '0'};
+void i2a(int x, char buf[])
+{
+	if(x<0){
+		x = -x;
+	}
+	int i=0;
+	while(x){
+		buf[i++] = 0x30 + (x % 10);
+		x = x / 10;
+	}
+}
+void display(int ms)
+{
+	static int i=0;
+	xqD7Write(&d1, i,buf[3-i]); 
+	i++;
+	if(i>=4) i=0;
+}
 void uart_cb(unsigned char c)
 {
 	xqUartSendByte(c);
 }
-static int duty_percent = 100;
-void clock_wise();
-void ccw();
 void on_second()
 {
 	static unsigned int s = 0;
-	if(s % 10 == 0){
-		clock_wise();
-	}else if(s % 5 == 0){
-		ccw();
-	}
 	s++;
+	i2a(s, buf);
 }
 void on_ms()
 {
 	static unsigned ms = 0;
-	static int i = 1;
-	if(i==1){
-		xqGpioWrite(A5, HIGH);
-	}
-	if(i==duty_percent) {
-		xqGpioWrite(A5, LOW);
-	}
-	if(++i==100){
-		i=1;
-	}
-	
 	ms++;
-	if(ms % 1000 == 0){
+	if(ms % 100 == 0){
 		on_second();
 	}
-}
-
-
-void A2_ready(unsigned int r)
-{
-	duty_percent = (int)(100.0 * r / 1023.0);
-	char msg[16]={0};
-	sprintf(msg, "duty cycle: %d\r\n", duty_percent);
-	xqUartSendStr(msg);
-}
-
-void clock_wise()
-{
-	xqGpioWrite(2, LOW);
-	xqGpioWrite(3, HIGH);
-	xqGpioWrite(4, HIGH);
-	xqGpioWrite(5, LOW);
-}
-
-void ccw()
-{
-	xqGpioWrite(2, HIGH);
-	xqGpioWrite(3, LOW);
-	xqGpioWrite(4, LOW);
-	xqGpioWrite(5, HIGH);
+	if(ms % 5 == 0){
+		display(ms/5);
+	}
 }
 
 int main()
@@ -85,26 +66,10 @@ int main()
 	xqTimerInit(on_ms);
 	xqTimerStart();
 
-	xqAdcInit();
-	xqAdcAdd(A2, 1, A2_ready);
-	xqAdcStart();
-
-	xqGpioSetMode(A0, OUT); // A0 for 1_2_EN
-	xqGpioWrite(A0, HIGH);
-
-
-	xqGpioSetMode(A5, OUT);	// A5 for INPUT
-	xqGpioWrite(A5, HIGH);
-
-	xqGpioSetMode(2, OUT); // Relay, Yellow
-	xqGpioSetMode(3, OUT); // Relay, Orange
-	xqGpioSetMode(4, OUT); // Relay, Blue
-	xqGpioSetMode(5, OUT); // Relay, Black
-
-	xqGpioWrite(2, HIGH);
-	xqGpioWrite(3, HIGH);
-	xqGpioWrite(4, HIGH);
-	xqGpioWrite(5, HIGH);
+	unsigned char selPin[] = {A1,A2,A3,A4};
+	xqD7Init(&d1, 6,7,8,9,10,11,12,13, selPin, 4);
+	xqD7Write(&d1, 0, '3');
+	xqD7Write(&d1, 1, '3');
 
 	while(1);
 	return 0;

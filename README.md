@@ -1,5 +1,15 @@
 # Arduino Drivers
 
+## 7-segments display driver
+### Usage
+	#include "XqD7.h"
+	
+	XqD7 display1;
+	
+	unsigned char selPin[] = {A1,A2,A3,A4};
+	xqD7Init(&d1, 6,7,8,9,10,11,12,13, selPin, 4);
+	xqD7Write(&display1, 0, '3');
+
 ## Stepper motor driver
 ### Usage
 
