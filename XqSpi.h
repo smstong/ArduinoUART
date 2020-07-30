@@ -30,12 +30,10 @@
 void xqSpiInit(char mode);
 void xqSpiAddSlave(unsigned char pinSS);
 
-/* as a master */
 void xqSpiEnableSlave(unsigned char pinSS);
 void xqSpiDisableSlave(unsigned char pinSS);
-void xqSpiSendByte(unsigned char c);
 
-/* as a slave */
-unsigned char xqSpiRecvByte();
+/* return byte_in, send out byte_out */
+unsigned char xqSpiTransferByte(unsigned char byte_out);
 
 #endif /* #ifndef _XQ_SPI_H */

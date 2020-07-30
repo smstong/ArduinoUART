@@ -53,16 +53,11 @@ void xqSpiDisableSlave(unsigned char pinSS)
 	}
 	xqGpioWrite(pinSS, HIGH);
 }
-void xqSpiSendByte(unsigned char c)
+/* SPI always recev and send at the same time, even if
+ * one way communication is intended. */
+unsigned char xqSpiTransferByte(unsigned char byte_out)
 {
-	SPDR = c;
+	SPDR = byte_out;
 	while(!(SPSR&(1<<SPIF))); /* wait until c is sent. */
-}
-
-/* as a slave */
-unsigned char xqSpiRecvByte()
-{
-	while(!(SPSR&(1<<SPIF)));
 	return SPDR;
 }
-

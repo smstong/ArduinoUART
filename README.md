@@ -1,5 +1,22 @@
 # Arduino Drivers
 
+## SPI driver
+### Usage
+	#include "XqSpi.h"
+	
+	unsigned char pin_slave_1 = 8;
+	unsigned char byte_out = 'O';
+	unsigned char byte_in;	
+	
+	xqSpiInit(XQ_SPI_MODE_MASTER);
+	xqSpiAddSlave(pin_slave_1);
+	
+	xqSpiEnableSlave(pin_slave_1);
+	
+	byte_in = xqSpiTransferByte(byte_out);
+	
+	xqSpiDisableSlave(pin_slave_1);
+
 ## 7-segments display driver
 ### Usage
 	#include "XqD7.h"

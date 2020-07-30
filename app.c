@@ -21,25 +21,41 @@
 #define SPI_MOSI 11
 #define SPI_SS 10
 
+unsigned char spi_bitbang_byte(unsigned char byte_out)
+{
+	unsigned char byte_in = 0;
+	unsigned char bit;
+	for(bit = 0x80; bit; bit >>= 1){
+		xqGpioWrite(SPI_MOSI, (byte_out & bit) ? HIGH : LOW);
+		_delay_ms(50);
+		xqGpioWrite(SPI_CLK, HIGH);
+		if(xqGpioRead(SPI_MISO)) {
+			byte_in |= bit;
+		}
+		_delay_ms(100);
+		xqGpioWrite(SPI_CLK, LOW);
+	}
+	return byte_in;
+}
 int main()
 {
 	xqUartInit(9600);
 	xqSpiInit(XQ_SPI_MODE_MASTER);
-	xqSpiAddSlave(8);
+	xqSpiAddSlave(SPI_SS);
 
 	int i=0;
 	unsigned char c;
 	while(1){
-		xqSpiEnableSlave(8);
-		xqUartSendStr("sending... \r\n");
 		if(i%2==0){
 			c = 0xFF;
 		}else{
 			c = 0x00;
 		}
-		xqSpiSendByte(c);
-		xqUartSendStr("sent.\r\n");
-		xqSpiDisableSlave(8);
+		xqSpiEnableSlave(SPI_SS);
+		c = xqSpiTransferByte(c);
+		xqSpiDisableSlave(SPI_SS);
+
+		xqUartSendByte(c);
 		i++;
 		_delay_ms(1000);
 	}
