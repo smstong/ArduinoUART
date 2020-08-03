@@ -14,6 +14,7 @@
 #include "XqStepMotor.h"
 #include "XqD7.h"
 #include "XqSpi.h"
+#include "XqVirtualUart.h"
 #include <avr/interrupt.h>
 
 #define SPI_CLK 13
@@ -37,27 +38,14 @@ unsigned char spi_bitbang_byte(unsigned char byte_out)
 	}
 	return byte_in;
 }
+
+XqVirtualUart s0;
 int main()
 {
-	xqUartInit(9600);
-	xqSpiInit(XQ_SPI_MODE_MASTER);
-	xqSpiAddSlave(SPI_SS);
-
-	int i=0;
-	unsigned char c;
+	xqVirtualUartInit(&s0, 9, 8, 9600);
 	while(1){
-		if(i%2==0){
-			c = 0xFF;
-		}else{
-			c = 0x00;
-		}
-		xqSpiEnableSlave(SPI_SS);
-		c = xqSpiTransferByte(c);
-		xqSpiDisableSlave(SPI_SS);
-
-		xqUartSendByte(c);
-		i++;
-		_delay_ms(1000);
+		unsigned char byte_in = xqVirtualUartRecvByte(&s0);
+		xqVirtualUartSendByte(&s0, byte_in);
 	}
 	return 0;
 }

@@ -9,7 +9,7 @@ app.hex: app.elf
 	avr-objcopy -O ihex -R .eeprom $< $@
 
 app.elf: app.o XqUart.o XqGpio.o XqLcd.o XqKb.o XqAdc.o \
-	XqTimer.o XqStepMotor.o XqD7.o XqSpi.o
+	XqTimer.o XqStepMotor.o XqD7.o XqSpi.o XqVirtualUart.o
 	avr-gcc $(LDFLAGS) -o $@ $^
 
 app.o: app.c
@@ -40,6 +40,9 @@ XqD7.o: XqD7.c XqD7.h
 	avr-gcc $(CFLAGS) -c -o $@ $<
 
 XqSpi.o: XqSpi.c XqSpi.h
+	avr-gcc $(CFLAGS) -c -o $@ $<
+
+XqVirtualUart.o: XqVirtualUart.c XqVirtualUart.h
 	avr-gcc $(CFLAGS) -c -o $@ $<
 
 deploy: app.hex
