@@ -1,5 +1,19 @@
 # Arduino Drivers
 
+## Virtual UART driver
+	#include "XqVirtualUart.h"	
+### Usage
+	XqVirtualUart s0;
+	int main()
+	{
+		xqVirtualUartInit(&s0, 9, 8, 9600); /* Tx: pin 9, Rx: pin 8 */
+		while(1){
+			unsigned char byte_in = xqVirtualUartRecvByte(&s0);
+			xqVirtualUartSendByte(&s0, byte_in);
+		}
+		return 0;
+	}
+
 ## SPI driver
 ### Usage
 	#include "XqSpi.h"
