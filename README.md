@@ -1,8 +1,24 @@
 # Arduino Drivers
 
+This repo is a collection C libs written for Arduino Uno R3 when I learn it.
+Arduino IDE/API is NOT used, while avr-as/avr-gcc/avrdude are used directly.
+
+Development Env:
+
+* OS: CentOS7
+* Assembler: avr-as
+* C compiler: avr-gcc
+* Programmer: avrdude
+* Hardware: Arduino Uno R3
+
+Learn Arduino the harder way.
+Learn Arduino from the scratch.
+Learn Arduino with Assebly and C.
+
 ## Virtual UART driver
-	#include "XqVirtualUart.h"	
 ### Usage
+	#include "XqVirtualUart.h"	
+
 	XqVirtualUart s0;
 	int main()
 	{
