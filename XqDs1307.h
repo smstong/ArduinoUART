@@ -7,7 +7,8 @@
 #define _XQ_DS1307_H
 
 void xqDs1307Init();
-void xqDs1307GetTime(
+/* ignore the parameter with 255 value */
+void xqDs1307SetTime(
 		unsigned char year,
 		unsigned char mon,
 		unsigned char day,
@@ -16,7 +17,8 @@ void xqDs1307GetTime(
 		unsigned char min,
 		unsigned char second
 		);
-void xqDs1307SetTime(
+/* ignore the parameter with NULL value */
+void xqDs1307GetTime(
 		unsigned char* year,
 		unsigned char* mon,
 		unsigned char* day,

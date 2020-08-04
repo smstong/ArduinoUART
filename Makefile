@@ -10,10 +10,10 @@ app.hex: app.elf
 
 app.elf: app.o XqUart.o XqGpio.o XqLcd.o XqKb.o XqAdc.o \
 	XqTimer.o XqStepMotor.o XqD7.o XqSpi.o XqVirtualUart.o \
-	XqI2c.o
+	XqI2c.o XqDs1307.o
 	avr-gcc $(LDFLAGS) -o $@ $^
 
-app.o: app.c
+app.o: app.c *.h
 	avr-gcc $(CFLAGS) -c -o $@ $<
 
 XqUart.o: XqUart.c XqUart.h
@@ -47,6 +47,9 @@ XqVirtualUart.o: XqVirtualUart.c XqVirtualUart.h
 	avr-gcc $(CFLAGS) -c -o $@ $<
 
 XqI2c.o: XqI2c.c XqI2c.h
+	avr-gcc $(CFLAGS) -c -o $@ $<
+
+XqDs1307.o: XqDs1307.c XqDs1307.h
 	avr-gcc $(CFLAGS) -c -o $@ $<
 
 deploy: app.hex
