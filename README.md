@@ -15,6 +15,24 @@ Learn Arduino the harder way.
 Learn Arduino from the scratch.
 Learn Arduino with Assebly and C.
 
+## I2C driver
+### Usage
+	#include "XqI2c.h"
+	
+	xqI2cInit();
+
+	xqI2cStart();
+	xqI2cWriteByte(0xD0);
+	xqI2cWriteByte(0x00);
+	xqI2cStop();
+	
+	xqI2cStart();
+	xqI2cWriteByte(0xD1);
+	xqI2cReadByte(1);
+	xqI2cReadByte(1);
+	xqI2cReadByte(0);
+	xqI2cStop();
+
 ## Virtual UART driver
 ### Usage
 	#include "XqVirtualUart.h"	
