@@ -15,6 +15,18 @@ Learn Arduino the harder way.
 Learn Arduino from the scratch.
 Learn Arduino with Assebly and C.
 
+## DS1307 RTC driver
+### Usage
+	#include "XqDs1307.h"
+	
+	unsigned char hour, min, second;
+	unsigned char year, mon, day, dow;
+	
+	xqDs1307Init();
+	xqDs1307SetTime(20,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+	xqDs1307GetTime(&year, &mon, &day, &dow, &hour, &min, &second);
+
+
 ## I2C driver
 ### Usage
 	#include "XqI2c.h"
