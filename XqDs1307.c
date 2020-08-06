@@ -1,7 +1,7 @@
 #include "XqDs1307.h"
 #include "XqI2c.h"
 
-static void rtc_read_all(
+static int rtc_read_all(
 		unsigned char* year,
 		unsigned char* mon,
 		unsigned char* day,
@@ -11,25 +11,46 @@ static void rtc_read_all(
 		unsigned char* second
 		)
 {
-	xqI2cStart();
-	xqI2cWriteByte(0xD0);
-	xqI2cWriteByte(0x00);
+	if(-1==xqI2cStart()){
+		return -1;
+	}
+	if(-1==xqI2cWriteByte(0xD0)) return -1;
+	if(-1==xqI2cWriteByte(0x00)) return -1;
 	xqI2cStop();
 
 	xqI2cStart();
-	xqI2cWriteByte(0xD1);
+	if(-1 == xqI2cWriteByte(0xD1)) return -1;
 
-	*second = xqI2cReadByte(1);
-	*min = xqI2cReadByte(1);
-	*hour = xqI2cReadByte(1);
-	*dow = xqI2cReadByte(1);
-	*day = xqI2cReadByte(1);
-	*mon = xqI2cReadByte(1);
-	*year = xqI2cReadByte(0);
+	int _second, _min, _hour, _dow, _day, _mon, _year;
+
+	_second = xqI2cReadByte(1);
+	if(_second == -1) return -1;
+	_min = xqI2cReadByte(1);
+	if(_min == -1) return -1;
+	_hour = xqI2cReadByte(1);
+	if(_hour == -1) return -1;
+	_dow = xqI2cReadByte(1);
+	if(_dow == -1) return -1;
+	_day = xqI2cReadByte(1);
+	if(_day == -1) return -1;
+	_mon = xqI2cReadByte(1);
+	if(_mon == -1) return -1;
+	_year = xqI2cReadByte(0);
+	if(_year == -1) return -1;
+
+	*second = (unsigned char)_second;
+	*min = (unsigned char)_min;
+	*hour = (unsigned char)_hour;
+	*dow = (unsigned char)_dow;
+	*day = (unsigned char)_day;
+	*mon = (unsigned char)_mon;
+	*year = (unsigned char)_year;
+
 	xqI2cStop();
+	return 0;
 }
 
-static void rtc_set_all(
+static int rtc_set_all(
 		unsigned char year,
 		unsigned char mon,
 		unsigned char day,
@@ -40,30 +61,33 @@ static void rtc_set_all(
 		)
 {
 	xqI2cStart();
-	xqI2cWriteByte(0xD0);
-	xqI2cWriteByte(0x00);
-	xqI2cWriteByte(second);
-	xqI2cWriteByte(min);
-	xqI2cWriteByte(hour);
-	xqI2cWriteByte(dow);
-	xqI2cWriteByte(day);
-	xqI2cWriteByte(mon);
-	xqI2cWriteByte(year);
+	if(-1 == xqI2cWriteByte(0xD0)) return -1;
+	if(-1 == xqI2cWriteByte(0x00)) return -1;
+	if(-1 == xqI2cWriteByte(second)) return -1;
+	if(-1 == xqI2cWriteByte(min)) return -1;
+	if(-1 == xqI2cWriteByte(hour)) return -1;
+	if(-1 == xqI2cWriteByte(dow)) return -1;
+	if(-1 == xqI2cWriteByte(day)) return -1;
+	if(-1 == xqI2cWriteByte(mon)) return -1;
+	if(-1 == xqI2cWriteByte(year)) return -1;
 	xqI2cStop();
+
+	return 0;
 }
 	
 /******************* API section ******************************/
-void xqDs1307Init()
+int xqDs1307Init()
 {
 	xqI2cInit();
 	xqI2cStart();
-	xqI2cWriteByte(0xD0);
-	xqI2cWriteByte(0x07);
-	xqI2cWriteByte(0x00);
+	if(-1==xqI2cWriteByte(0xD0)) return -1;
+	if(-1==xqI2cWriteByte(0x07)) return -1;
+	if(-1==xqI2cWriteByte(0x00)) return -1;
 	xqI2cStop();
+	return 0;
 }
 /* ignore the parameter with NULL value */
-void xqDs1307GetTime(
+int xqDs1307GetTime(
 		unsigned char* year,
 		unsigned char* mon,
 		unsigned char* day,
@@ -74,7 +98,10 @@ void xqDs1307GetTime(
 		)
 {
 	unsigned char _year, _mon, _day, _dow, _hour, _min, _second;
-	rtc_read_all(&_year, &_mon, &_day, &_dow, &_hour, &_min, &_second);
+	if(-1 == rtc_read_all(
+				&_year, &_mon, &_day, &_dow, &_hour, &_min, &_second)){
+		return -1;
+	}
 
 	if(year){
 		*year = (_year & 0x0F) + (_year>>4)*10;
@@ -97,9 +124,10 @@ void xqDs1307GetTime(
 	if(second){
 		*second = (_second & 0x0F) + (_second>>4)*10;
 	}
+	return 0;
 }
 /* ignore the parameter with 255 value */
-void xqDs1307SetTime(
+int xqDs1307SetTime(
 		unsigned char year,
 		unsigned char mon,
 		unsigned char day,
@@ -110,7 +138,10 @@ void xqDs1307SetTime(
 		)
 {
 	unsigned char _year, _mon, _day, _dow, _hour, _min, _second;
-	xqDs1307GetTime(&_year, &_mon, &_day, &_dow, &_hour, &_min, &_second);
+	if(-1==xqDs1307GetTime(
+				&_year, &_mon, &_day, &_dow, &_hour, &_min, &_second)){
+		return -1;
+	}
 
 	if(year != 0xFF){
 		_year = ((year / 10) << 4) + (year % 10);
@@ -133,5 +164,8 @@ void xqDs1307SetTime(
 	if(second != 0xFF){
 		_second = ((second / 10) << 4) + (second % 10);
 	}
-	rtc_set_all(_year, _mon, _day, _dow, _hour, _min, _second);
+	if(-1 == rtc_set_all(_year, _mon, _day, _dow, _hour, _min, _second)){
+		return -1;
+	}
+	return 0;
 }

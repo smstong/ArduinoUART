@@ -48,13 +48,24 @@ int main()
 
 	xqVirtualUartInit(&s0, 9, 8, 9600);
 
-	xqDs1307Init();
-	//xqDs1307SetTime(20,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF);
+	if(-1==xqDs1307Init()){
+		uart_send_str("error: xqDs1307Init()\r\n");
+	}else{
+		uart_send_str("done: xqDs1307Init()\r\n");
+	}
+	if(-1 == xqDs1307SetTime(20,8,5,3,12,42,55)){
+		uart_send_str("error: xqDs1307SetTime()\r\n");
+	}else{
+		uart_send_str("done: xqDs1307SetTime()\r\n");
+	}
 
 	while(1){
-		xqDs1307GetTime(&year, &mon, &day, &dow, &hour, &min, &second);
-		show_time(year, mon, day, dow, hour, min, second);
-
+		if(-1 == xqDs1307GetTime(
+			&year, &mon, &day, &dow, &hour, &min, &second)){
+			uart_send_str("error: xqDs1307GetTime()\r\n");
+		}else{
+			show_time(year, mon, day, dow, hour, min, second);
+		}
 		_delay_ms(1000);
 	}
 	return 0;
