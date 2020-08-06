@@ -5,10 +5,9 @@
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
-
 #include "XqVirtualUart.h"
-#include <avr/interrupt.h>
 #include "XqDs1307.h"
+#include "XqTimer.h"
 
 XqVirtualUart s0;
 
@@ -32,10 +31,27 @@ void show_time(unsigned char year,
 	uart_send_str("\r\n");
 }
 
+void on_ms()
+{
+	static unsigned int ms = 0;
+	if(ms % 1000 == 0){
+		ms = 0;
+		unsigned char hour, min, second;
+		unsigned char year, mon, day, dow;
+		if(-1 == xqDs1307GetTime(
+					&year, &mon, &day, &dow, &hour, &min, &second)){
+			uart_send_str("error: xqDs1307GetTime()\r\n");
+		}else{
+			show_time(year, mon, day, dow, hour, min, second);
+		}
+	}
+	ms++;
+}
+
 int main()
 {
-	unsigned char hour, min, second;
-	unsigned char year, mon, day, dow;
+	xqTimerInit(on_ms);
+	xqTimerStart();
 
 	xqVirtualUartInit(&s0, 9, 8, 9600);
 
@@ -44,20 +60,15 @@ int main()
 	}else{
 		uart_send_str("done: xqDs1307Init()\r\n");
 	}
-	if(-1 == xqDs1307SetTime(20,8,5,3,20,24,55)){
+	/*
+	if(-1 == xqDs1307SetTime(20,8,6,4,00,57,55)){
 		uart_send_str("error: xqDs1307SetTime()\r\n");
 	}else{
 		uart_send_str("done: xqDs1307SetTime()\r\n");
 	}
-
+	*/
 	while(1){
-		if(-1 == xqDs1307GetTime(
-			&year, &mon, &day, &dow, &hour, &min, &second)){
-			uart_send_str("error: xqDs1307GetTime()\r\n");
-		}else{
-			show_time(year, mon, day, dow, hour, min, second);
-		}
-		_delay_ms(1000);
+		;
 	}
 	return 0;
 }

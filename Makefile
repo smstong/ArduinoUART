@@ -16,7 +16,8 @@ app.hex: app.elf
 	avr-objcopy -O ihex -R .eeprom $< $@
 
 app.elf: app.o libXqArduino.a
-	avr-gcc $< $(LDFLAGS) -L. -lXqArduino  -o $@ 
+	# note: -L -l must be after app.o
+	avr-gcc -o $@ $< $(LDFLAGS) -L. -lXqArduino  
 
 libXqArduino.a:
 	cd src && make
