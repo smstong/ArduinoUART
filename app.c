@@ -6,17 +6,8 @@
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
 
-#include "XqUart.h"
-#include "XqLcd.h"
-#include "XqGpio.h"
-#include "XqKb.h"
-#include "XqAdc.h"
-#include "XqStepMotor.h"
-#include "XqD7.h"
-#include "XqSpi.h"
 #include "XqVirtualUart.h"
 #include <avr/interrupt.h>
-#include "XqI2c.h"
 #include "XqDs1307.h"
 
 XqVirtualUart s0;
@@ -53,7 +44,7 @@ int main()
 	}else{
 		uart_send_str("done: xqDs1307Init()\r\n");
 	}
-	if(-1 == xqDs1307SetTime(20,8,5,3,12,42,55)){
+	if(-1 == xqDs1307SetTime(20,8,5,3,20,24,55)){
 		uart_send_str("error: xqDs1307SetTime()\r\n");
 	}else{
 		uart_send_str("done: xqDs1307SetTime()\r\n");

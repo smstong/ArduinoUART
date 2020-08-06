@@ -5,55 +5,21 @@ ARDUINO_USB ?= /dev/ttyACM0
 
 all: app.hex
 
+deploy: app.hex
+	avrdude -F -V -c arduino -p ATMEGA328p -P ${ARDUINO_USB} -b 115200 -U flash:w:$<
+
+clean: 
+	rm -f *.elf *.hex *.o *.a app
+	cd src && make clean
+
 app.hex: app.elf
 	avr-objcopy -O ihex -R .eeprom $< $@
 
-app.elf: app.o XqUart.o XqGpio.o XqLcd.o XqKb.o XqAdc.o \
-	XqTimer.o XqStepMotor.o XqD7.o XqSpi.o XqVirtualUart.o \
-	XqI2c.o XqDs1307.o
-	avr-gcc $(LDFLAGS) -o $@ $^
+app.elf: app.o libXqArduino.a
+	avr-gcc $< $(LDFLAGS) -L. -lXqArduino  -o $@ 
 
-app.o: app.c *.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
+libXqArduino.a:
+	cd src && make
+app.o: app.c
+	avr-gcc $(CFLAGS) -I./src -c -o $@ $<
 
-XqUart.o: XqUart.c XqUart.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqGpio.o: XqGpio.c XqGpio.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqLcd.o: XqLcd.c XqLcd.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqKb.o: XqKb.c XqKb.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqAdc.o: XqAdc.c XqAdc.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqTimer.o: XqTimer.c XqTimer.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqStepMotor.o: XqStepMotor.c XqStepMotor.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqD7.o: XqD7.c XqD7.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqSpi.o: XqSpi.c XqSpi.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqVirtualUart.o: XqVirtualUart.c XqVirtualUart.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqI2c.o: XqI2c.c XqI2c.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-XqDs1307.o: XqDs1307.c XqDs1307.h
-	avr-gcc $(CFLAGS) -c -o $@ $<
-
-deploy: app.hex
-	avrdude -F -V -c arduino -p ATMEGA328p -P ${ARDUINO_USB} -b 115200 -U flash:w:app.hex
-
-clean: 
-	rm -f *.elf *.hex *.o app
