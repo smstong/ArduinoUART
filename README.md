@@ -105,12 +105,13 @@ Learn Arduino with Assebly and C.
 ### Usage
 	#include "XqTimer.h"
 	
-	void on_ms()
+	void on_timer(void* arg)
 	{
-		/* run something every 1 ms here */
+		/* run something every 100 us here */
 	}
 	
-	xqTimerInit(on_ms);	
+	xqTimerAddCb(on_timer, NULL);
+
 	xqTimerStart();
 	
 ## ADC driver

@@ -19,7 +19,8 @@ libXqArduino.a: \
 	XqSpi.o \
 	XqVirtualUart.o \
 	XqI2c.o \
-	XqDs1307.o
+	XqDs1307.o \
+	XqServo.o
 
 	avr-ar rcs $@ $^
 
@@ -57,4 +58,7 @@ XqI2c.o: XqI2c.c XqI2c.h
 	avr-gcc $(CFLAGS) -c -o $@ $<
 
 XqDs1307.o: XqDs1307.c XqDs1307.h
+	avr-gcc $(CFLAGS) -c -o $@ $<
+
+XqServo.o: XqServo.c XqServo.h
 	avr-gcc $(CFLAGS) -c -o $@ $<

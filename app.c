@@ -8,10 +8,17 @@
 #include "XqVirtualUart.h"
 #include "XqDs1307.h"
 #include "XqTimer.h"
+#include "XqGpio.h"
+#include "XqAdc.h"
+#include "XqTimer.h"
+#include "XqServo.h"
 
 XqVirtualUart s0;
+XqServo m1;
+XqServo m2;
+XqServo m3;
 
-void uart_send_str(const char* str)
+void print(const char* str)
 {
 	const char* p = NULL;
 	for(p=str; *p; p++){
@@ -19,56 +26,26 @@ void uart_send_str(const char* str)
 	}
 }
 
-void show_time(unsigned char year, 
-		unsigned char mon, unsigned char day, unsigned char dow,
-		unsigned char hour, unsigned char min, unsigned char second)
-{
-	char msg[32] = {0};
-	sprintf(msg, "20%02d-%02d-%02d dow:%02d %02d:%02d:%02d", 
-			year,mon,day,dow,hour,min,second);
-	uart_send_str("current time: ");
-	uart_send_str(msg);
-	uart_send_str("\r\n");
-}
-
-void on_ms()
-{
-	static unsigned int ms = 0;
-	if(ms % 1000 == 0){
-		ms = 0;
-		unsigned char hour, min, second;
-		unsigned char year, mon, day, dow;
-		if(-1 == xqDs1307GetTime(
-					&year, &mon, &day, &dow, &hour, &min, &second)){
-			uart_send_str("error: xqDs1307GetTime()\r\n");
-		}else{
-			show_time(year, mon, day, dow, hour, min, second);
-		}
-	}
-	ms++;
-}
-
 int main()
 {
-	xqTimerInit(on_ms);
+	xqVirtualUartInit(&s0, 9, 8, 9600);
+	xqServoInit(&m1, 6);
+	xqServoInit(&m2, 5);
+	xqServoInit(&m3, 2);
+
 	xqTimerStart();
 
-	xqVirtualUartInit(&s0, 9, 8, 9600);
-
-	if(-1==xqDs1307Init()){
-		uart_send_str("error: xqDs1307Init()\r\n");
-	}else{
-		uart_send_str("done: xqDs1307Init()\r\n");
-	}
-	/*
-	if(-1 == xqDs1307SetTime(20,8,6,4,00,57,55)){
-		uart_send_str("error: xqDs1307SetTime()\r\n");
-	}else{
-		uart_send_str("done: xqDs1307SetTime()\r\n");
-	}
-	*/
+	float angle = 0;
 	while(1){
-		;
+		xqServoSetPos(&m1, angle);
+		xqServoSetPos(&m2, angle);
+		xqServoSetPos(&m3, angle);
+		_delay_ms(100);
+		angle += 10.0;
+		if(angle >180){
+			angle = 0;
+		}
+
 	}
 	return 0;
 }

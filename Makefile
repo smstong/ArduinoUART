@@ -19,7 +19,7 @@ app.elf: app.o libXqArduino.a
 	# note: -L -l must be after app.o
 	avr-gcc -o $@ $< $(LDFLAGS) -L. -lXqArduino  
 
-libXqArduino.a:
+libXqArduino.a: ./src/*.c
 	cd src && make
 app.o: app.c
 	avr-gcc $(CFLAGS) -I./src -c -o $@ $<
