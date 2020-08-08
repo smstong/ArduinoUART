@@ -15,6 +15,15 @@ Learn Arduino the harder way.
 Learn Arduino from the scratch.
 Learn Arduino with Assebly and C.
 
+##  Servo motor driver
+### Usage
+	#include "XqServo.h"
+	
+	XqServo m1;	
+	xqServoInit(&m1, 2); /* Pin 2 for PWM */
+	xqServoSetPos(30);
+
+
 ## DS1307 RTC driver
 ### Usage
 	#include "XqDs1307.h"
