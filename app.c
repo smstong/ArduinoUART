@@ -1,51 +1,98 @@
-#include <string.h>
-#include <stdio.h>
 #include <avr/io.h>
 #define F_CPU 16000000UL
 #include <util/delay.h>
-#include <avr/pgmspace.h>
-#include <avr/eeprom.h>
-#include "XqVirtualUart.h"
-#include "XqDs1307.h"
-#include "XqTimer.h"
 #include "XqGpio.h"
-#include "XqAdc.h"
-#include "XqTimer.h"
-#include "XqServo.h"
+#include <avr/interrupt.h>
 
-XqVirtualUart s0;
-XqServo m1;
-XqServo m2;
-XqServo m3;
+typedef struct Servo {
+	unsigned char pin;
+	unsigned int duty_clicks;
+	unsigned int cycle_clicks; 
+	unsigned int clicks;
+}Servo;
 
-void print(const char* str)
+/* 18 pins for servos: 2-13, A0-A5 */
+Servo M[18];
+
+static void on_100us();
+ISR(TIMER0_OVF_vect)
 {
-	const char* p = NULL;
-	for(p=str; *p; p++){
-		xqVirtualUartSendByte(&s0, *p); 
+	TCNT0 = 231; /*256 - 160 */
+	on_100us();
+}
+
+static void start_timer()
+{
+	TCNT0 = 231;
+	TCCR0A = 0;
+	TIMSK0 = (1<<TOIE0);
+	TCCR0B = 0x03; /* prescal = 1 */
+	sei();
+}
+
+#define US_PER_CLICK 100
+static void init_servos()
+{
+	int i=0;
+	unsigned char pins[] = {2,3,4,5,6,7,8,9,10,11,12,13,A0,A1,A2,A3,A4,A5};
+	for(i=0; i<18; i++){
+		M[i].pin = pins[i];
+		M[i].duty_clicks = 500 / US_PER_CLICK;
+		M[i].cycle_clicks = 2000 / US_PER_CLICK;
+		M[i].clicks = 0;
+		xqGpioSetMode(M[i].pin, OUT);
+	}
+}
+static void on_100us()
+{
+	int i;
+	for(i=0; i<17; i++){
+		if(M[i].clicks == 0){
+			xqGpioWrite(M[i].pin, HIGH);
+		}
+		if(M[i].clicks == M[i].duty_clicks){
+			xqGpioWrite(M[i].pin, LOW);
+		}
+		M[i].clicks ++;	
+		if(M[i].clicks == M[i].cycle_clicks){
+			M[i].clicks = 0;
+		}
 	}
 }
 
+
 int main()
 {
-	xqVirtualUartInit(&s0, 9, 8, 9600);
-	xqServoInit(&m1, 6);
-	xqServoInit(&m2, 5);
-	xqServoInit(&m3, 2);
+	init_servos();
+	start_timer();
 
-	xqTimerStart();
-
-	float angle = 0;
-	while(1){
-		xqServoSetPos(&m1, angle);
-		xqServoSetPos(&m2, angle);
-		xqServoSetPos(&m3, angle);
-		_delay_ms(100);
-		angle += 10.0;
-		if(angle >180){
-			angle = 0;
-		}
-
+	/* start_listen */
+	int i=0; 
+	for(i=0;i<18;i++){
+		M[i].duty_clicks = 5;
 	}
+	while(1)
+	{
+		/* start_listen */
+		int i=0; 
+		for(i=0;i<18;i++){
+			M[i].duty_clicks = 500/US_PER_CLICK;
+		}
+		xqGpioWrite(A5, HIGH);
+		_delay_ms(1000);
+		for(i=0;i<18;i++){
+			M[i].duty_clicks = 1400/US_PER_CLICK;
+		}
+		xqGpioWrite(A5, LOW);
+		_delay_ms(1000);
+		for(i=0;i<18;i++){
+			M[i].duty_clicks = 24/US_PER_CLICK;
+		}
+		xqGpioWrite(A5, HIGH);
+		_delay_ms(1000);
+		xqGpioWrite(A5, LOW);
+		_delay_ms(1000);
+	}
+
 	return 0;
 }

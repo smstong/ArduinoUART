@@ -62,13 +62,12 @@ static void on_adc(u16 r)
 	ADCSRA |= (1<<ADSC);
 }
 
-/********************** API section ***************************/
-void xqAdcInit()
+static void adc_init()
 {
 	ADCSRA = 0x8F;	
 	sei();
 }
-
+/********************** API section ***************************/
 /*
  * pin: A0,...,A5
  * vref: 0-AREF pin, 1-AVcc, 3-internal 1.1
@@ -80,6 +79,7 @@ void xqAdcAdd(u8 pin, u8 vref, XqAdcCb cb)
 
 void xqAdcStart()
 {
+	adc_init();
 	if(adcPins == 0) return;
 	adc_select_pair(adcPairs[0]);	
 	ADCSRA |= (1<<ADSC);
